@@ -14,6 +14,7 @@ def plot_monthly_return_distribution(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to plot stock price trend
 def plot_stock_price_trend(df):
     plt.figure(figsize=(14, 6))
@@ -25,6 +26,7 @@ def plot_stock_price_trend(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to plot moving averages
 def plot_moving_averages(df):
     plt.figure(figsize=(14, 6))
@@ -38,6 +40,7 @@ def plot_moving_averages(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to plot average weekly return
 def plot_weekly_avg_return(df):
     df['Weekday'] = df.index.weekday
@@ -50,6 +53,7 @@ def plot_weekly_avg_return(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to plot quarterly seasonality
 def plot_quarterly_seasonality(df):
     df['Quarter'] = df.index.quarter
@@ -62,6 +66,7 @@ def plot_quarterly_seasonality(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to plot volatility over time
 def plot_volatility(df):
     plt.figure(figsize=(14, 6))
@@ -75,14 +80,16 @@ def plot_volatility(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to calculate and plot correlation heatmap
 def plot_correlation_heatmap(df):
-    corr_matrix = df[['Close', 'Monthly_Return', 'MA5', 'MA10', 'MA20', 'Volatility_5', 'Volatility_10', 'Volatility_20']].corr()
+    corr_matrix = df[['Low','High','Open','Close', 'Monthly_Return', 'MA5', 'MA10', 'MA20', 'Volatility_5', 'Volatility_10', 'Volatility_20']].corr()
     plt.figure(figsize=(10, 8))
     sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt='.2f', linewidths=0.5, cbar_kws={"shrink": 0.8})
     plt.title('Correlation Heatmap of Tesla Stock Features')
     plt.tight_layout()
     plt.show()
+    
 # Function to plot volume vs price movement
 def plot_volume_vs_price(df):
     fig, ax1 = plt.subplots(figsize=(12, 6))
@@ -97,6 +104,7 @@ def plot_volume_vs_price(df):
     plt.title('Tesla Price Movement and Volume')
     plt.tight_layout()
     plt.show()
+    
 # Function to calculate and plot Z-score outliers
 def plot_zscore_outliers(df):
     df['Z-Score_Return'] = zscore(df['Monthly_Return'].dropna())
@@ -111,6 +119,7 @@ def plot_zscore_outliers(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to calculate and plot IQR-based outliers
 def plot_iqr_outliers(df):
     Q1 = df['Monthly_Return'].quantile(0.25)
@@ -129,6 +138,7 @@ def plot_iqr_outliers(df):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+    
 # Function to calculate Sharpe Ratio
 def calculate_sharpe_ratio(df, risk_free_rate=0.02):
     risk_free_rate /= 12  # Convert to monthly risk-free rate
@@ -136,6 +146,7 @@ def calculate_sharpe_ratio(df, risk_free_rate=0.02):
     std_dev = df['Monthly_Return'].std()
     sharpe_ratio = (mean_return - risk_free_rate) / std_dev
     print(f"Sharpe Ratio: {sharpe_ratio:.4f}")
+    
 # Function to calculate and plot cumulative returns
 def plot_cumulative_returns(df):
     df['Daily_Return'] = df['Close'].pct_change() * 100
