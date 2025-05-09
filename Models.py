@@ -127,10 +127,84 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
-from sklearn.preprocessing import MinMaxScaler
-import matplotlib.pyplot as plt 
+
+def create_sliding_window(data, window_size=5):
+    """
+    Converts time series data into sliding windows for LSTM input.
+    :param data: The input time series data (e.g., stock prices).
+    :param window_size: The number of time steps used to predict the next step.
+    :return: X (input features), y (target/labels)
+    """
+    X, y = [], []
+    for i in range(len(data) - window_size):
+        X.append(data[i:i + window_size])  # Input sequence (window)
+        y.append(data[i + window_size])    # Target value (next value in time series)
+    return np.array(X), np.array(y)
+
+def preprocess_for_lstm(df, window_size=5):
+    """
+    Preprocess the data for LSTM by creating sliding windows.
+    :param df: DataFrame containing the time series data
+    :param window_size: The size of the sliding window for creating sequences
+    :return: X (features), y (targets)
+    """
+    # Select multiple features, not just 'Close'
+    features = ['Close', 'Open', 'High', 'Low', 'Volume', 'MA5', 'MA10', 'MA20']  # Add any other features you want
+    data = df[features].values  # Extract multiple features as input
+
+    # Create sliding windows
+    X, y = create_sliding_window(data, window_size)
+
+    # Reshape X for LSTM: (samples, time_steps, features)
+    X = X.reshape((X.shape[0], X.shape[1], len(features)))  # Adjust for the number of features
+
+    return X, y
 
 
+def build_lstm_model(X_train):
+    """
+    Builds and compiles an LSTM model for time series prediction.
+    :param X_train: Training data
+    :return: model: Compiled LSTM model
+    """
+    model = Sequential()
+    model.add(LSTM(units=50, return_sequences=False, input_shape=(X_train.shape[1], X_train.shape[2])))  # Corrected input shape
+    model.add(Dense(1))  # Output layer
+    model.compile(optimizer='adam', loss='mean_squared_error')
+    return model
+
+def lstm_model(df_train, df_test, window_size=5):
+    """
+    Trains the LSTM model on the training data and makes predictions on the test data.
+    :param df_train: Training data
+    :param df_test: Test data
+    :param window_size: Size of the sliding window
+    :return: y_test, y_pred: Actual values for the test set and predicted values
+    """
+    # Preprocess data for LSTM
+    X_train, y_train = preprocess_for_lstm(df_train, window_size)
+    X_test, y_test = preprocess_for_lstm(df_test, window_size)
+    
+    print(len(X_test))
+
+
+    # Build the LSTM model
+    model = build_lstm_model(X_train)
+
+    # Train the model
+    model.fit(X_train, y_train, epochs=10, batch_size=32)
+
+    # Make predictions
+    y_pred = model.predict(X_test)
+    
+    # Flatten the arrays to make them 1D
+    y_test = y_test.flatten()  # Ensure y_test is 1D
+    y_pred = y_pred.flatten()  # Ensure y_pred is 1D
+    
+    assert len(y_test) == len(y_pred), f"Mismatch in number of samples: {len(y_test)} vs {len(y_pred)}"
+
+    # Return actual and predicted values
+    return y_test, y_pred
 
 
 
