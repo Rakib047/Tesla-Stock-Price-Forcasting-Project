@@ -336,6 +336,7 @@ def tune_lstm_hyperparameters(X_train, y_train, window_size=5):
 
 def plot_training_history(history):
     # Plot training and validation loss
+    plt.figure(figsize=(16,10))
     plt.plot(history.history['loss'], label='Training Loss')
     plt.plot(history.history['val_loss'], label='Validation Loss')
     plt.title('Model Loss During Training')
@@ -518,7 +519,7 @@ def gru_model(df_train, df_test, window_size=5):
     early_stop = EarlyStopping(patience=50, restore_best_weights=True)
 
     # Train the best model found from the tuning
-    best_model.fit(
+    history_gru=best_model.fit(
         X_train, y_train,
         validation_split=0.2,
         epochs=64,
@@ -526,6 +527,8 @@ def gru_model(df_train, df_test, window_size=5):
         callbacks=[early_stop],
         verbose=1
     )
+    
+    plot_training_history(history_gru)
 
     # Make predictions on the test set
     y_pred = best_model.predict(X_test)
