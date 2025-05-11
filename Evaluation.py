@@ -42,6 +42,8 @@ def evaluate_model(y_true, y_pred):
     print(f"R-squared (R²): {r2:.4f}")
     print(f"Mean Absolute Percentage Error (MAPE): {mape:.4f}%")
     print("\n")
+    
+    return mae, mse, rmse, r2, mape
 
 
 # def evaluate_model(y_true, y_pred):

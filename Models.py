@@ -538,7 +538,45 @@ def gru_model(df_train, df_test, window_size=5):
 
 
 
+def walk_forward_validation(df, model_func, feature_cols, target_col='Target', start=100, step=1):
+    """
+    Perform walk-forward validation.
 
+    Parameters:
+        df: DataFrame containing all features and target
+        model_func: function that returns a fitted model (e.g., LinearRegression)
+        feature_cols: list of feature column names
+        target_col: name of the target column
+        start: number of initial samples to train on
+        step: how many steps ahead to predict (default 1)
+
+    Returns:
+        y_true: list of actual values
+        y_pred: list of predicted values
+    """
+    y_true, y_pred = [], []
+
+    for i in range(start, len(df) - step):
+        train_data = df.iloc[:i]
+        test_data = df.iloc[i:i+step]
+
+        X_train = train_data[feature_cols]
+        y_train = train_data[target_col]
+
+        X_test = test_data[feature_cols]
+        y_test = test_data[target_col]
+
+        # Train model
+        model = model_func()
+        model.fit(X_train, y_train)
+
+        # Predict
+        pred = model.predict(X_test)
+
+        y_true.extend(y_test.values)
+        y_pred.extend(pred.flatten())
+
+    return y_true, y_pred
 
 
 
