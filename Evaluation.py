@@ -2,6 +2,7 @@
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def evaluate_model(y_true, y_pred):
@@ -138,3 +139,65 @@ def volatility_error_plot(df_test,df_test_scaled,y_pred):
     plt.show()
     
     return mae_volatility, rmse_volatility
+
+
+
+def plot_model_comparsion(results):
+    # Assuming you have already populated `results_normal_training` with results for all models
+
+    # Convert the results into a DataFrame
+    df_results = pd.DataFrame(results)
+
+
+
+    # Plotting: Side by side bar charts for MAE, MSE, RMSE, R², and MAPE
+    fig, axes = plt.subplots(3, 2, figsize=(18, 12))
+
+
+
+    # Plot MAE (Mean Absolute Error)
+    mae_bars = df_results.set_index('Model')['MAE'].plot(kind='bar', ax=axes[0, 0], color='blue')
+    axes[0, 0].set_title('Mean Absolute Error (MAE)')
+    axes[0, 0].set_ylabel('Error')
+    axes[0, 0].tick_params(axis='x', rotation=45)
+    # Add percentage labels above each bar
+    mae_bars.bar_label(mae_bars.containers[0], labels=[f'{v:.2f}' for v in df_results['MAE']])
+
+    # Plot MSE (Mean Squared Error)
+    mse_bars = df_results.set_index('Model')['MSE'].plot(kind='bar', ax=axes[0, 1], color='green')
+    axes[0, 1].set_title('Mean Squared Error (MSE)')
+    axes[0, 1].set_ylabel('Error')
+    axes[0, 1].tick_params(axis='x', rotation=45)
+    # Add percentage labels above each bar
+    mse_bars.bar_label(mse_bars.containers[0], labels=[f'{v:.6f}' for v in df_results['MSE']])
+
+    # Plot RMSE (Root Mean Squared Error)
+    rmse_bars = df_results.set_index('Model')['RMSE'].plot(kind='bar', ax=axes[1, 0], color='red')
+    axes[1, 0].set_title('Root Mean Squared Error (RMSE)')
+    axes[1, 0].set_ylabel('Error')
+    axes[1, 0].tick_params(axis='x', rotation=45)
+    # Add percentage labels above each bar
+    rmse_bars.bar_label(rmse_bars.containers[0], labels=[f'{v:.2f}' for v in df_results['RMSE']])
+
+    # Plot R² (R-squared)
+    r2_bars = df_results.set_index('Model')['R2'].plot(kind='bar', ax=axes[1, 1], color='cyan')
+    axes[1, 1].set_title('R² Score')
+    axes[1, 1].set_ylabel('R²')
+    axes[1, 1].tick_params(axis='x', rotation=45)
+    # Add percentage labels above each bar
+    r2_bars.bar_label(r2_bars.containers[0], labels=[f'{v:.2f}' for v in df_results['R2']])
+
+    # Plot MAPE (Mean Absolute Percentage Error)
+    mape_bars = df_results.set_index('Model')['MAPE'].plot(kind='bar', ax=axes[2, 0], color='orange')
+    axes[2, 0].set_title('Mean Absolute Percentage Error (MAPE)')
+    axes[2, 0].set_ylabel('Error (%)')
+    axes[2, 0].tick_params(axis='x', rotation=45)
+    # Add percentage labels above each bar
+    mape_bars.bar_label(mape_bars.containers[0], labels=[f'{v:.2f}%' for v in df_results['MAPE']])
+
+    # Hide the last subplot (empty)
+    axes[2, 1].axis('off')
+
+    # Tight layout to ensure no clipping of labels
+    plt.tight_layout()
+    plt.show()

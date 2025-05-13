@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
-
+import joblib
 
 
 #Simple Moving Average (SMA) Model
@@ -33,7 +33,7 @@ def plot_simple_moving_average(df):
 # Linear Regression Model
 
 # Function to train and test the Linear Regression model
-def linear_regression_model(df_train, df_test):
+def linear_regression_model(df_train, df_test,model_filename='linear_regression_model.pkl'):
     """
     Trains the Linear Regression model on the training data and tests it on the test data.
     :param df_train: Training data
@@ -46,19 +46,22 @@ def linear_regression_model(df_train, df_test):
     
     # Train the model
     model.fit(df_train[['Low','High','Open','Close','Volume' ,'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train[['Target']])
+    
+        # Save the model to a file
+    joblib.dump(model, model_filename)
 
     # Make predictions on the test set
     y_pred = model.predict(df_test[['Low','High','Open','Close','Volume' ,'Monthly_Return', 'MA5', 'MA10', 'MA20']])
 
     # Return actual and predicted values
-    return df_test[['Target']], y_pred
+    return df_test['Target'], y_pred
 
 
 # Random Forest Model
 
 from sklearn.ensemble import RandomForestRegressor
 
-def random_forest_model(df_train, df_test):
+def random_forest_model(df_train, df_test,model_filename='random_forest_model.pkl'):
     """
     Trains the Random Forest Regressor model on the training data and tests it on the test data.
     :param df_train: Training data
@@ -72,6 +75,8 @@ def random_forest_model(df_train, df_test):
     # Train the model using features and target from training data
     model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
     
+    joblib.dump(model, model_filename)
+    
     # Make predictions on the test set
     y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
     
@@ -80,7 +85,7 @@ def random_forest_model(df_train, df_test):
 
 from sklearn.svm import SVR
 
-def svr_model(df_train, df_test):
+def svr_model(df_train, df_test,model_filename='svr_model.pkl'):
     """
     Trains the Support Vector Regressor (SVR) model on the training data and tests it on the test data.
     :param df_train: Training data
@@ -94,6 +99,8 @@ def svr_model(df_train, df_test):
     # Train the model using features and target from training data
     model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
     
+    joblib.dump(model, model_filename)
+    
     # Make predictions on the test set
     y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
     
@@ -102,7 +109,7 @@ def svr_model(df_train, df_test):
 
 from sklearn.tree import DecisionTreeRegressor
 
-def decision_tree_model(df_train, df_test):
+def decision_tree_model(df_train, df_test,model_filename='decision_tree_model.pkl'):
     """
     Trains the Decision Tree Regressor model on the training data and tests it on the test data.
     :param df_train: Training data
@@ -116,6 +123,8 @@ def decision_tree_model(df_train, df_test):
     # Train the model using features and target from training data
     model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
     
+    joblib.dump(model, model_filename)
+    
     # Make predictions on the test set
     y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
     
@@ -125,7 +134,7 @@ def decision_tree_model(df_train, df_test):
 
 #XGBoost Model
 import xgboost as xgb
-def xgboost_model(df_train, df_test):
+def xgboost_model(df_train, df_test,model_filename='xgboost_model.pkl'):
     """
     Trains the XGBoost model on the training data and tests it on the test data.
     :param df_train: Training data
@@ -139,9 +148,47 @@ def xgboost_model(df_train, df_test):
     # Train the model using features and target from training data
     model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
     
+    joblib.dump(model, model_filename)
+    
     # Make predictions on the test set
     y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
     
+    # Return actual and predicted values
+    return df_test['Target'], y_pred
+
+# Voting Ensemble
+
+from sklearn.ensemble import VotingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVR
+import xgboost as xgb
+
+def voting_model(df_train, df_test,model_filename='voting_model.pkl'):
+    """
+    Trains a Voting Regressor model on the training data and tests it on the test data.
+    :param df_train: Training data
+    :param df_test: Test data
+    :return: y_test: Actual values for the test set, y_pred: Predicted values for the test set
+    """
+    
+    # Define the base models for voting
+    model_rf = RandomForestRegressor(n_estimators=100, random_state=42)
+    model_lr = LinearRegression()
+    model_svr = SVR(kernel='rbf', C=100, epsilon=0.1)
+    model_xgb = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
+
+    # Initialize the Voting Regressor
+    model = VotingRegressor(estimators=[('rf', model_rf), ('lr', model_lr), ('svr', model_svr), ('xgb', model_xgb)])
+
+    # Train the model
+    model.fit(df_train[['Low','High','Open','Close','Volume','Monthly_Return','MA5','MA10','MA20']], df_train['Target'])
+    
+    joblib.dump(model, model_filename)
+
+    # Make predictions on the test set
+    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume','Monthly_Return','MA5','MA10','MA20']])
+
     # Return actual and predicted values
     return df_test['Target'], y_pred
 
@@ -538,7 +585,7 @@ def gru_model(df_train, df_test, window_size=5):
 
 
 
-def walk_forward_validation(df, model_func, feature_cols, target_col='Target', start=100, step=1):
+def walk_forward_validation(df, model_func, feature_cols, target_col='Target', start=100, step=30):
     """
     Perform walk-forward validation.
 
@@ -577,6 +624,10 @@ def walk_forward_validation(df, model_func, feature_cols, target_col='Target', s
         y_pred.extend(pred.flatten())
 
     return y_true, y_pred
+
+
+
+
 
 
 
