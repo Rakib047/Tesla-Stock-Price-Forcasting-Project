@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 import joblib
+import pandas as pd
 
 
 #Simple Moving Average (SMA) Model
@@ -33,7 +34,7 @@ def plot_simple_moving_average(df):
 # Linear Regression Model
 
 # Function to train and test the Linear Regression model
-def linear_regression_model(df_train, df_test,model_filename='Models/slinear_regression_model.pkl'):
+def linear_regression_model(df_train, df_test,model_filename='Models/linear_regression_model.pkl'):
     """
     Trains the Linear Regression model on the training data and tests it on the test data.
     :param df_train: Training data
@@ -630,6 +631,72 @@ def walk_forward_validation(df, model_func, feature_cols, target_col='Target', s
         y_pred.extend(pred.flatten())
 
     return y_true, y_pred
+
+from prophet import Prophet
+
+def run_and_evaluate_prophet(df_full):
+    """
+    Run and evaluate the Prophet model.
+    :param df_full: DataFrame containing the full dataset
+    :return: None
+    """
+    
+
+    df_prophet = df_full[['Close']].copy()        # Copy just the 'Close' column
+    df_prophet.reset_index(inplace=True)       # Bring 'Date' index back as a column
+    df_prophet.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
+
+    # Create train-test split (80% train, 20% test)
+    train_size = int(len(df_prophet) * 0.8)
+    df_train_prophet = df_prophet[:train_size]
+    df_test_prophet = df_prophet[train_size:]
+    m = Prophet()
+    m.fit(df_train_prophet)
+
+    # Save the model
+    joblib.dump(m, 'Models/prophet_model.pkl')
+
+
+    future = m.make_future_dataframe(periods=len(df_test_prophet))
+    future.tail()
+
+    forecast = m.predict(future)
+    forecast[['ds', 'yhat']].tail()
+
+    fig1 = m.plot(forecast)
+    fig2 = m.plot_components(forecast)
+
+    from prophet.plot import plot_plotly, plot_components_plotly
+
+    plot_plotly(m, forecast)
+
+
+    from sklearn.metrics import mean_absolute_error, mean_squared_error
+    import numpy as np
+    from sklearn.metrics import r2_score
+
+    # 1. Merge actual and predicted values on 'ds'
+    # Ensure 'df_prophet' contains the original actual values
+
+    # df_actual = df_prophet[['ds', 'y']]
+    # df_predicted = forecast[['ds', 'yhat']]
+
+    forecast_test = forecast.iloc[train_size:].copy()
+
+    # 2. Merge on date ('ds')
+    df_compare = pd.merge(df_test_prophet, forecast_test, on='ds', how='inner')
+
+    # 3. Calculate errors (you can choose any metric you want)
+    mae = mean_absolute_error(df_compare['y'], df_compare['yhat'])
+    rmse = np.sqrt(mean_squared_error(df_compare['y'], df_compare['yhat']))
+    r2 = r2_score(df_compare['y'], df_compare['yhat'])
+
+    print(f"MAE: {mae}")
+    print(f"RMSE: {rmse}")
+    print(f"R² Score: {r2}")
+
+
+# Python
 
 
 
