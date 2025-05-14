@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
-from scipy.stats import zscore, skew, kurtosis
+import joblib
 
 # # Function to load and preprocess the dataset
 def load_data(file_path):
@@ -58,10 +58,34 @@ def split_data(df, train_size=0.8):
 
 
 # Function to scale features using MinMaxScaler
-def scale_features(df_train, df_test, feature_cols):
-    scaler = MinMaxScaler()
+# def scale_features(df_train, df_test, feature_cols):
+#     scaler = MinMaxScaler()
+#     df_train_scaled = df_train.copy()
+#     df_test_scaled = df_test.copy()
+#     df_train_scaled[feature_cols] = scaler.fit_transform(df_train[feature_cols])
+#     df_test_scaled[feature_cols] = scaler.transform(df_test[feature_cols])
+    
+#     # Save the scaler
+#     joblib.dump(scaler, "Scaler/scaler_minmax.pkl")
+    
+#     return df_train_scaled, df_test_scaled, scaler
+
+def scale_features(df_train, df_test, feature_cols, target_cols):
+
+    # Feature scaler
+    scaler_X = MinMaxScaler()
     df_train_scaled = df_train.copy()
     df_test_scaled = df_test.copy()
-    df_train_scaled[feature_cols] = scaler.fit_transform(df_train[feature_cols])
-    df_test_scaled[feature_cols] = scaler.transform(df_test[feature_cols])
-    return df_train_scaled, df_test_scaled, scaler
+    df_train_scaled[feature_cols] = scaler_X.fit_transform(df_train[feature_cols])
+    df_test_scaled[feature_cols] = scaler_X.transform(df_test[feature_cols])
+    
+    # Target scaler
+    scaler_y = MinMaxScaler()
+    df_train_scaled[target_cols] = scaler_y.fit_transform(df_train[target_cols])
+    df_test_scaled[target_cols] = scaler_y.transform(df_test[target_cols])
+    
+    # Save scalers
+    joblib.dump(scaler_X, "Scaler/scaler_X_minmax.pkl")
+    joblib.dump(scaler_y, "Scaler/scaler_y_minmax.pkl")
+
+    return df_train_scaled, df_test_scaled, scaler_X, scaler_y

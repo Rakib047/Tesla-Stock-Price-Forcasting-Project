@@ -46,13 +46,13 @@ def linear_regression_model(df_train, df_test,model_filename='Models/linear_regr
     model = LinearRegression()
     
     # Train the model
-    model.fit(df_train[['Low','High','Open','Close','Volume' ,'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train[['Target']])
+    model.fit(df_train[['Low','High','Open','Close','Volume']], df_train[['Target']])
     
         # Save the model to a file
     joblib.dump(model, model_filename)
 
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume' ,'Monthly_Return', 'MA5', 'MA10', 'MA20']])
+    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume']])
 
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -74,12 +74,12 @@ def random_forest_model(df_train, df_test,model_filename='Models/random_forest_m
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
+    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
+    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
     
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -98,12 +98,12 @@ def svr_model(df_train, df_test,model_filename='Models/svr_model.pkl'):
     model = SVR(kernel='rbf', C=100, epsilon=0.1)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
+    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
+    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
     
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -122,12 +122,12 @@ def decision_tree_model(df_train, df_test,model_filename='Models/decision_tree_m
     model = DecisionTreeRegressor(random_state=42)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
+    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
+    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
     
     # Return actual and predicted values    
     return df_test['Target'], y_pred
@@ -147,12 +147,12 @@ def xgboost_model(df_train, df_test,model_filename='Models/xgboost_model.pkl'):
     model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']], df_train['Target'])
+    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume', 'Monthly_Return', 'MA5', 'MA10', 'MA20']])
+    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
     
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -183,12 +183,12 @@ def voting_model(df_train, df_test,model_filename='Models/voting_model.pkl'):
     model = VotingRegressor(estimators=[('rf', model_rf), ('lr', model_lr), ('svr', model_svr), ('xgb', model_xgb)])
 
     # Train the model
-    model.fit(df_train[['Low','High','Open','Close','Volume','Monthly_Return','MA5','MA10','MA20']], df_train['Target'])
+    model.fit(df_train[['Low','High','Open','Close','Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
 
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume','Monthly_Return','MA5','MA10','MA20']])
+    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume']])
 
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -328,7 +328,7 @@ def preprocess_for_lstm(df, window_size=5):
     :param window_size: The size of the sliding window for creating sequences
     :return: X (features), y (targets)
     """
-    features = ['Close', 'Open', 'High', 'Low', 'Volume', 'MA5', 'MA10', 'MA20']
+    features = ['Low', 'High', 'Open', 'Close', 'Volume']  # Add any other features you want
     data = df[features].values
 
     X, y = create_sliding_window(data, window_size)
@@ -344,7 +344,7 @@ def build_lstm_model(hp, window_size=5):
     
     # Tuning the number of units for LSTM layer
     model.add(LSTM(units=hp.Int('lstm_units_1', min_value=50, max_value=200, step=50), 
-                   return_sequences=True, input_shape=(window_size, 8)))
+                   return_sequences=True, input_shape=(window_size, 5)))
     model.add(Dropout(hp.Float('dropout_1', min_value=0.1, max_value=0.5, step=0.1)))
     
     model.add(LSTM(units=hp.Int('lstm_units_2', min_value=50, max_value=200, step=50), return_sequences=False))
@@ -429,7 +429,7 @@ def lstm_model(df_train, df_test, window_size=5):
 #GRU Model
 
 def preprocess_for_gru(df, window_size=5):
-    features = ['Close', 'Open', 'High', 'Low', 'Volume', 'MA5', 'MA10', 'MA20']
+    features = ['Low', 'High', 'Open', 'Close', 'Volume']
     data = df[features].values
 
     X, y = create_sliding_window(data, window_size)
@@ -501,7 +501,7 @@ def build_gru_model(hp, window_size=5):
     
     # Tuning the number of units for GRU layers
     model.add(GRU(units=hp.Int('gru_units_1', min_value=50, max_value=200, step=50), 
-                  return_sequences=True, input_shape=(window_size, 8)))
+                  return_sequences=True, input_shape=(window_size, 5)))
     model.add(Dropout(hp.Float('dropout_1', min_value=0.1, max_value=0.5, step=0.1)))
     
     model.add(GRU(units=hp.Int('gru_units_2', min_value=50, max_value=200, step=50), return_sequences=True))
@@ -530,7 +530,7 @@ def build_gru_model(hp, window_size=5):
 
 # Preprocess the data for GRU model (same as before)
 def preprocess_for_gru(df, window_size=5):
-    features = ['Close', 'Open', 'High', 'Low', 'Volume', 'MA5', 'MA10', 'MA20']
+    features = ['Low', 'High', 'Open', 'Close', 'Volume']
     data = df[features].values
 
     X, y = create_sliding_window(data, window_size)
