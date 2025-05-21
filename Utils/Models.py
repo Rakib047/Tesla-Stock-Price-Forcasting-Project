@@ -46,13 +46,13 @@ def linear_regression_model(df_train, df_test,model_filename='Models/linear_regr
     model = LinearRegression()
     
     # Train the model
-    model.fit(df_train[['Low','High','Open','Close','Volume']], df_train[['Target']])
+    model.fit(df_train[['Open', 'High', 'Low', 'Close', 'Volume']], df_train[['Target']])
     
         # Save the model to a file
     joblib.dump(model, model_filename)
 
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume']])
+    y_pred = model.predict(df_test[['Open', 'High', 'Low', 'Close', 'Volume']])
 
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -74,12 +74,12 @@ def random_forest_model(df_train, df_test,model_filename='Models/random_forest_m
     model = RandomForestRegressor(n_estimators=100, random_state=42)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
+    model.fit(df_train[['Open', 'High', 'Low', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
+    y_pred = model.predict(df_test[['Open', 'High', 'Low', 'Close', 'Volume']])
     
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -98,12 +98,12 @@ def svr_model(df_train, df_test,model_filename='Models/svr_model.pkl'):
     model = SVR(kernel='rbf', C=100, epsilon=0.1)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
+    model.fit(df_train[['Open', 'High', 'Low', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
+    y_pred = model.predict(df_test[['Open', 'High', 'Low', 'Close', 'Volume']])
     
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -122,12 +122,12 @@ def decision_tree_model(df_train, df_test,model_filename='Models/decision_tree_m
     model = DecisionTreeRegressor(random_state=42)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
+    model.fit(df_train[['Open', 'High', 'Low', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
+    y_pred = model.predict(df_test[['Open', 'High', 'Low', 'Close', 'Volume']])
     
     # Return actual and predicted values    
     return df_test['Target'], y_pred
@@ -147,12 +147,12 @@ def xgboost_model(df_train, df_test,model_filename='Models/xgboost_model.pkl'):
     model = xgb.XGBRegressor(objective='reg:squarederror', n_estimators=100, random_state=42)
     
     # Train the model using features and target from training data
-    model.fit(df_train[['Low', 'High', 'Open', 'Close', 'Volume']], df_train['Target'])
+    model.fit(df_train[['Open', 'High', 'Low', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
     
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low', 'High', 'Open', 'Close', 'Volume']])
+    y_pred = model.predict(df_test[['Open', 'High', 'Low', 'Close', 'Volume']])
     
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -183,12 +183,12 @@ def voting_model(df_train, df_test,model_filename='Models/voting_model.pkl'):
     model = VotingRegressor(estimators=[('rf', model_rf), ('lr', model_lr), ('svr', model_svr), ('xgb', model_xgb)])
 
     # Train the model
-    model.fit(df_train[['Low','High','Open','Close','Volume']], df_train['Target'])
+    model.fit(df_train[['Open', 'High', 'Low', 'Close', 'Volume']], df_train['Target'])
     
     joblib.dump(model, model_filename)
 
     # Make predictions on the test set
-    y_pred = model.predict(df_test[['Low','High','Open','Close','Volume']])
+    y_pred = model.predict(df_test[['Open', 'High', 'Low', 'Close', 'Volume']])
 
     # Return actual and predicted values
     return df_test['Target'], y_pred
@@ -328,7 +328,7 @@ def preprocess_for_lstm(df, window_size=5):
     :param window_size: The size of the sliding window for creating sequences
     :return: X (features), y (targets)
     """
-    features = ['Low', 'High', 'Open', 'Close', 'Volume']  # Add any other features you want
+    features = ['Open', 'High', 'Low', 'Close', 'Volume']  # Add any other features you want
     data = df[features].values
 
     X, y = create_sliding_window(data, window_size)
@@ -360,8 +360,7 @@ def build_lstm_model(hp, window_size=5):
                   loss='mean_squared_error', 
                   metrics=[tf.keras.metrics.RootMeanSquaredError()])
     
-    # After training your model
-    model.save('Models/lstm_model.h5')  # or use .keras or SavedModel folder format
+    # After training your model  # or use .keras or SavedModel folder format
 
     
     return model
@@ -416,6 +415,7 @@ def lstm_model(df_train, df_test, window_size=5):
     # Train the model
     history_lstm = best_model.fit(X_train, y_train, epochs=30, batch_size=64, validation_split=0.2, verbose=1)
 
+    best_model.save('Models/lstm_model.h5')
     # Plot the training history
     plot_training_history(history_lstm)
 
@@ -429,7 +429,7 @@ def lstm_model(df_train, df_test, window_size=5):
 #GRU Model
 
 def preprocess_for_gru(df, window_size=5):
-    features = ['Low', 'High', 'Open', 'Close', 'Volume']
+    features = ['Open', 'High', 'Low', 'Close', 'Volume']
     data = df[features].values
 
     X, y = create_sliding_window(data, window_size)
@@ -523,14 +523,13 @@ def build_gru_model(hp, window_size=5):
     model.compile(optimizer=Adam(learning_rate=lr_schedule),
                   loss='mean_squared_error',
                   metrics=[tf.keras.metrics.RootMeanSquaredError()])
-    
-    model.save('Models/gru_model.h5')  # Save the model after training
+      # Save the model after training
     return model
 
 
 # Preprocess the data for GRU model (same as before)
 def preprocess_for_gru(df, window_size=5):
-    features = ['Low', 'High', 'Open', 'Close', 'Volume']
+    features = ['Open', 'High', 'Low', 'Close', 'Volume']
     data = df[features].values
 
     X, y = create_sliding_window(data, window_size)
@@ -582,6 +581,8 @@ def gru_model(df_train, df_test, window_size=5):
         verbose=1
     )
     
+    best_model.save('Models/gru_model.h5')
+    
     plot_training_history(history_gru)
 
     # Make predictions on the test set
@@ -590,7 +591,7 @@ def gru_model(df_train, df_test, window_size=5):
     # Return actual and predicted values
     return y_test, y_pred
 
-
+from sklearn.metrics import mean_squared_error
 
 def walk_forward_validation(df, model_func, feature_cols, target_col='Target', start=100, step=30):
     """
@@ -609,6 +610,9 @@ def walk_forward_validation(df, model_func, feature_cols, target_col='Target', s
         y_pred: list of predicted values
     """
     y_true, y_pred = [], []
+    
+    train_sizes = []
+    train_errors = []
 
     for i in range(start, len(df) - step):
         train_data = df.iloc[:i]
@@ -626,74 +630,74 @@ def walk_forward_validation(df, model_func, feature_cols, target_col='Target', s
 
         # Predict
         pred = model.predict(X_test)
+        
+                # Predict on training data to get training error
+        train_pred = model.predict(X_train)
+        train_mse = mean_squared_error(y_train, train_pred)
 
         y_true.extend(y_test.values)
         y_pred.extend(pred.flatten())
+        
+        train_sizes.append(len(X_train))
+        train_errors.append(train_mse)
+    
+    # Plot training curve
+    plt.figure(figsize=(8,5))
+    plt.plot(train_sizes, train_errors, label='Training MSE')
+    plt.xlabel('Training Set Size')
+    plt.ylabel('Mean Squared Error')
+    plt.title('Training Error Curve Over Increasing Training Size')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
     return y_true, y_pred
 
 from prophet import Prophet
+import plotly.graph_objects as go
 
-def run_and_evaluate_prophet(df_full):
+def run_and_predict_prophet(df_full, future_periods,df_actual_2024=None):
     """
-    Run and evaluate the Prophet model.
-    :param df_full: DataFrame containing the full dataset
-    :return: None
-    """
+    Train Prophet on the full dataset and predict future values.
     
-
-    df_prophet = df_full[['Close']].copy()        # Copy just the 'Close' column
-    df_prophet.reset_index(inplace=True)       # Bring 'Date' index back as a column
+    :param df_full: DataFrame with DateTime index and 'Close' column
+    :param future_periods: int, number of future periods (days) to forecast
+    :return: forecast DataFrame with predictions
+    """
+    df_prophet = df_full[['Close']].copy()
+    df_prophet.reset_index(inplace=True)
     df_prophet.rename(columns={'Date': 'ds', 'Close': 'y'}, inplace=True)
-
-    # Create train-test split (80% train, 20% test)
-    train_size = int(len(df_prophet) * 0.8)
-    df_train_prophet = df_prophet[:train_size]
-    df_test_prophet = df_prophet[train_size:]
+    
+    # Train on full data
     m = Prophet()
-    m.fit(df_train_prophet)
-
+    m.fit(df_prophet)
+    
     # Save the model
     joblib.dump(m, 'Models/prophet_model.pkl')
-
-
-    future = m.make_future_dataframe(periods=len(df_test_prophet))
-    future.tail()
-
+    
+    # Create dataframe to hold future dates including historical + future
+    future = m.make_future_dataframe(periods=future_periods)
+    
+    # Predict future values
     forecast = m.predict(future)
-    forecast[['ds', 'yhat']].tail()
+    
+    # Plot interactive plotly plot (optional)
+    from prophet.plot import plot_plotly
+    fig = plot_plotly(m, forecast)
+    
+    
+    fig.add_trace(go.Scatter(
+    x=df_actual_2024['ds'],
+    y=df_actual_2024['y'],
+    mode='lines',
+    name='Actual 2024',
+    marker=dict(color='red', size=6)
+    ))
 
-    fig1 = m.plot(forecast)
-    fig2 = m.plot_components(forecast)
-
-    from prophet.plot import plot_plotly, plot_components_plotly
-
-    plot_plotly(m, forecast)
-
-
-    from sklearn.metrics import mean_absolute_error, mean_squared_error
-    import numpy as np
-    from sklearn.metrics import r2_score
-
-    # 1. Merge actual and predicted values on 'ds'
-    # Ensure 'df_prophet' contains the original actual values
-
-    # df_actual = df_prophet[['ds', 'y']]
-    # df_predicted = forecast[['ds', 'yhat']]
-
-    forecast_test = forecast.iloc[train_size:].copy()
-
-    # 2. Merge on date ('ds')
-    df_compare = pd.merge(df_test_prophet, forecast_test, on='ds', how='inner')
-
-    # 3. Calculate errors (you can choose any metric you want)
-    mae = mean_absolute_error(df_compare['y'], df_compare['yhat'])
-    rmse = np.sqrt(mean_squared_error(df_compare['y'], df_compare['yhat']))
-    r2 = r2_score(df_compare['y'], df_compare['yhat'])
-
-    print(f"MAE: {mae}")
-    print(f"RMSE: {rmse}")
-    print(f"R² Score: {r2}")
+    
+    fig.show()
+    
+    return forecast
 
 
 # Python

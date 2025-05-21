@@ -1,68 +1,85 @@
-import matplotlib.pyplot as plt
-# Plot the train, test, and XGBoost prediction data
-def plot_test_train_prediction(model_name,df_train, df_test, y_pred):
-    plt.figure(figsize=(16, 10))
-    
-    # Plot the train data
-    plt.plot(df_train.index, df_train['Close'], label='Train', color='teal')
-    
-    # Plot the test data
-    plt.plot(df_test.index, df_test['Close'], label='Test', color='magenta')
-    
-    
-    # Plot the model predictions
-    plt.plot(df_test.index, y_pred, label=f'{model_name} Predictions', color='blue', linestyle='dashed')
-    
-    
-    # Title and labels
-    plt.title(f'{model_name} Predictions vs Actual Test Data')
-    plt.xlabel('Date')
-    plt.ylabel('Close Price USD ($)')
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    plt.show()
-    
-    
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+
+def plot_test_train_prediction(model_name, df_train, df_test, y_pred):
+    fig = go.Figure()
+
+    # Train data
+    fig.add_trace(go.Scatter(
+        x=df_train.index, y=df_train['Close'],
+        mode='lines',
+        name='Train',
+        line=dict(color='teal')
+    ))
+
+    # Test data
+    fig.add_trace(go.Scatter(
+        x=df_test.index, y=df_test['Close'],
+        mode='lines',
+        name='Test',
+        line=dict(color='magenta')
+    ))
+
+    # Prediction data
+    fig.add_trace(go.Scatter(
+        x=df_test.index, y=y_pred,
+        mode='lines',
+        name=f'{model_name} Predictions',
+        line=dict(color='blue', dash='dash')
+    ))
+
+    fig.update_layout(
+        title=f'{model_name} Predictions vs Actual Test Data',
+        xaxis_title='Date',
+        yaxis_title='Close Price USD ($)',
+        legend_title='',
+        width=900, height=600,
+        template='plotly_white',
+    )
+
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+
+    fig.show()
+
 
 def plot_test_train_prediction_log(model_name, df_train, df_test, y_pred, log_scale=True):
-    """
-    Plots the training, testing, and predicted data.
-    Optionally uses a logarithmic scale on the Y-axis.
-    
-    Parameters:
-    - model_name: str, name of the model for the legend/title
-    - df_train: DataFrame containing the training data (must have 'Close' column)
-    - df_test: DataFrame containing the test data (must have 'Close' column)
-    - y_pred: Predicted values (must match length of df_test)
-    - log_scale: bool, whether to use logarithmic scale on y-axis
-    """
-    
-    plt.figure(figsize=(16, 10))
-    
-    # Plot training data
-    plt.plot(df_train.index, df_train['Close'], label='Train', color='teal')
-    
-    # Plot test data
-    plt.plot(df_test.index, df_test['Close'], label='Test', color='magenta')
-    
-    # Plot model predictions
-    plt.plot(df_test.index, y_pred, label=f'{model_name} Predictions', color='blue', linestyle='dashed')
-    
-    # Set log scale if requested
-    if log_scale:
-        plt.yscale('log')
-    
-    # Titles and labels
-    plt.title(f'{model_name} Predictions vs Actual Test Data {"(Log Scale)" if log_scale else ""}')
-    plt.xlabel('Date')
-    plt.ylabel('Close Price USD ($)')
-    plt.legend()
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-    plt.tight_layout()
-    plt.show()
-    
+    fig = go.Figure()
 
+    # Train data
+    fig.add_trace(go.Scatter(
+        x=df_train.index, y=df_train['Close'],
+        mode='lines',
+        name='Train',
+        line=dict(color='teal')
+    ))
 
+    # Test data
+    fig.add_trace(go.Scatter(
+        x=df_test.index, y=df_test['Close'],
+        mode='lines',
+        name='Test',
+        line=dict(color='magenta')
+    ))
 
+    # Prediction data
+    fig.add_trace(go.Scatter(
+        x=df_test.index, y=y_pred,
+        mode='lines',
+        name=f'{model_name} Predictions',
+        line=dict(color='blue', dash='dash')
+    ))
+
+    fig.update_layout(
+        title=f'{model_name} Predictions vs Actual Test Data {"(Log Scale)" if log_scale else ""}',
+        xaxis_title='Date',
+        yaxis_title='Close Price USD ($)',
+        legend_title='',
+        width=900, height=600,
+        template='plotly_white',
+    )
+
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGray',
+                     type='log' if log_scale else 'linear')
+
+    fig.show()

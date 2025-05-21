@@ -118,25 +118,69 @@ def volatility_error_plot(df_test,df_test_scaled,y_pred):
 
 
     # Plot the volatility
-    plt.figure(figsize=(12, 6))
-    plt.plot(df_test.index, df_test['Rolling_Volatility'], label='Rolling Volatility', color='blue')
-    plt.axhline(volatility_threshold, color='red', linestyle='--', label='High Volatility Threshold')
-    plt.title('Volatility (Rolling 30-day Std Dev of Returns)')
-    plt.xlabel('Date')
-    plt.ylabel('Volatility')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    import plotly.graph_objects as go
 
-    # Plot the model errors during high volatility periods
-    plt.figure(figsize=(12, 6))
-    plt.plot(high_volatility_data.index, high_volatility_data['Error'], label='Model Error During High Volatility', color='red')
-    plt.title('Model Error During High Volatility Periods')
-    plt.xlabel('Date')
-    plt.ylabel('Error')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    # Plot volatility
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=df_test.index,
+        y=df_test['Rolling_Volatility'],
+        mode='lines',
+        name='Rolling Volatility',
+        line=dict(color='blue')
+    ))
+
+    fig.add_trace(go.Scatter(
+        x=[df_test.index.min(), df_test.index.max()],
+        y=[volatility_threshold, volatility_threshold],
+        mode='lines',
+        name='High Volatility Threshold',
+        line=dict(color='red', dash='dash')
+    ))
+
+    fig.update_layout(
+        title='Volatility (Rolling 30-day Std Dev of Returns)',
+        xaxis_title='Date',
+        yaxis_title='Volatility',
+        legend_title='',
+        width=900, height=450,
+        template='plotly_white',
+        showlegend=True
+    )
+
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+
+    fig.show()
+
+
+    # Plot model errors during high volatility
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatter(
+        x=high_volatility_data.index,
+        y=high_volatility_data['Error'],
+        mode='lines',
+        name='Model Error During High Volatility',
+        line=dict(color='red')
+    ))
+
+    fig.update_layout(
+        title='Model Error During High Volatility Periods',
+        xaxis_title='Date',
+        yaxis_title='Error',
+        legend_title='',
+        width=900, height=450,
+        template='plotly_white',
+        showlegend=True
+    )
+
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='LightGray')
+
+    fig.show()
+
     
     return mae_volatility, rmse_volatility
 
@@ -147,11 +191,34 @@ def plot_model_comparsion(results):
 
     # Convert the results into a DataFrame
     df_results = pd.DataFrame(results)
+    
+    # Your list of full model names and their abbreviations
+    model_refs = {
+        "Linear Regression": "LR",
+        "Support Vector Regression": "SVR",
+        "Random Forest": "RF",
+        "Decision Tree": "DT",
+        "XGBoost": "XGB",
+        "Stacked Linear Regression": "SLR",
+        "Voting Regressor": "VR",
+        "Prophet": "PR",
+        "LSTM": "LSTM",
+        "GRU": "GRU"
+    }
 
 
 
     # Plotting: Side by side bar charts for MAE, MSE, RMSE, R², and MAPE
     fig, axes = plt.subplots(3, 2, figsize=(18, 12))
+    
+    plt.subplots_adjust(right=0.75)
+    
+    
+    
+    legend_text = '\n'.join([f"{k:<27}: {v}" for k, v in model_refs.items()])
+    fig.text(0.68, 0.2, legend_text,
+            fontsize=12, va='center', ha='left', fontfamily='monospace',
+            bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
 
 
 
