@@ -118,7 +118,7 @@ def test_create_sliding_window():
     np.testing.assert_array_equal(X[0], np.array([0,1,2,3,4]))
     assert y[0] == 5
 
-def test_preprocess_for_lstm():
+def test_preprocess_for_sequence_models():
     df = pd.DataFrame({
         'Open': np.arange(10),
         'High': np.arange(10) + 1,
@@ -131,18 +131,20 @@ def test_preprocess_for_lstm():
     assert X.shape == (5, 5, 5)
     assert y.shape == (5,)
 
+from kerastuner.engine.hyperparameters import HyperParameters
 
-def test_build_lstm_model():
-    from kerastuner.engine.hyperparameters import HyperParameters
+def test_build_sequence_model():
+    
     hp = HyperParameters()
-    model = build_lstm_model(hp, window_size=5)
-    assert isinstance(model, tf.keras.Model)
-    assert model.output_shape == (None, 1)
+    lstm_model = build_lstm_model(hp, window_size=5)
+    gru_model = build_gru_model(hp, window_size=5)
+    assert isinstance(lstm_model, tf.keras.Model)
+    assert isinstance(gru_model, tf.keras.Model)
+    assert lstm_model.output_shape == (None, 1)
+    assert gru_model.output_shape == (None, 1)
 
 
 from unittest.mock import MagicMock, patch
-import numpy as np
-import tensorflow as tf
 
 
 
@@ -151,7 +153,6 @@ import tensorflow as tf
 import pytest
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from unittest.mock import MagicMock, patch
 
 # Adjust this import to your actual module path
@@ -159,37 +160,47 @@ from unittest.mock import MagicMock, patch
 
 
 
+@pytest.mark.parametrize("model_func, tuner_patch", [
+    ("Utils.Models.lstm_model", "Utils.Models.tune_lstm_hyperparameters"),
+    ("Utils.Models.gru_model", "Utils.Models.tune_gru_hyperparameters"),
+])
 @patch("Utils.Models.plot_training_history")
-@patch("Utils.Models.tune_lstm_hyperparameters")
-def test_lstm_model(mock_tuner, mock_plot, sample_train_test_data):
-    # Create dummy model
-    dummy_model = tf.keras.Sequential([
-        tf.keras.layers.Input(shape=(5, 5)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(1)
-    ])
-    dummy_model.compile(optimizer='adam', loss='mse')
+def test_sequence_models(mock_plot,model_func, tuner_patch, sample_train_test_data):
+    import importlib
 
-    df_train, df_test, _ = sample_train_test_data()
+    # Dynamically import model function and tuner patch path
+    model_module = importlib.import_module("Utils.Models")
+    model_callable = getattr(model_module, model_func.split('.')[-1])
+    tuner_mock_path = tuner_patch
 
-    expected_samples = len(df_test) - 5  # window_size = 5
+    # Patch tuner dynamically
+    with patch(tuner_mock_path) as mock_tuner:
+        # Create dummy model to mock training and prediction
+        dummy_model = tf.keras.Sequential([
+            tf.keras.layers.Input(shape=(5, 5)),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(1)
+        ])
+        dummy_model.compile(optimizer='adam', loss='mse')
 
-    # Mock fit and predict behavior with correct shape
-    dummy_model.fit = MagicMock(return_value=MagicMock(history={'loss': [0.1], 'val_loss': [0.2]}))
-    dummy_model.predict = MagicMock(return_value=np.arange(1, expected_samples + 1).reshape(-1, 1))
+        df_train, df_test, _ = sample_train_test_data()
 
-    # Mock tuner and plot
-    mock_tuner.return_value = dummy_model
-    mock_plot.return_value = None
+        expected_samples = len(df_test) - 5  # window_size=5
 
-    # Run the lstm_model function
-    y_test, y_pred = lstm_model(df_train, df_test, window_size=5)
+        dummy_model.fit = MagicMock(return_value=MagicMock(history={'loss': [0.1], 'val_loss': [0.2]}))
+        dummy_model.predict = MagicMock(return_value=np.arange(1, expected_samples + 1).reshape(-1, 1))
 
-    # Assertions
-    assert isinstance(y_test, np.ndarray)
-    assert isinstance(y_pred, np.ndarray)
-    assert y_test.shape[0] == y_pred.shape[0]
-    np.testing.assert_array_equal(y_pred.flatten(), np.arange(1, expected_samples + 1))
+        mock_tuner.return_value = dummy_model
+        mock_plot.return_value = None
+
+        # Call the model function (LSTM or GRU)
+        y_test, y_pred = model_callable(df_train, df_test, window_size=5)
+
+        # Assertions
+        assert isinstance(y_test, np.ndarray)
+        assert isinstance(y_pred, np.ndarray)
+        assert y_test.shape[0] == y_pred.shape[0]
+        np.testing.assert_array_equal(y_pred.flatten(), np.arange(1, expected_samples + 1))
 
 
 
