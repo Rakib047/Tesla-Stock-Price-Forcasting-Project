@@ -58,7 +58,7 @@ def sample_train_test_data(tmp_path):
 
     return _factory
 
-def test_linear_regression_model(sample_train_test_data):
+def test_classical_model(sample_train_test_data):
     models = {
         "decision_tree_model.pkl": decision_tree_model,
         "linear_regression_model.pkl": linear_regression_model,
