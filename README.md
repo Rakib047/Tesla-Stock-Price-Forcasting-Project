@@ -1,7 +1,3 @@
-Sure! Here is a detailed and structured README.md for your Tesla Stock Price Forecasting Project based on the files and info you shared:
-
----
-
 # Tesla Stock Price Forecasting Project
 
 ## Overview

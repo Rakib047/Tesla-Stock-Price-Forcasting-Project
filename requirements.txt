@@ -1,0 +1,14 @@
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+xgboost
+tensorflow
+keras-tuner
+prophet
+plotly
+joblib
+pytest
+statsmodels
+scipy
