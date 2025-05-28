@@ -6,6 +6,9 @@ This project implements a comprehensive pipeline for forecasting Tesla (TSLA) st
 
 The aim is to predict stock price trends accurately and analyze model performance during both normal and volatile market conditions.
 
+## Problem Statement / Motivation
+Stock price prediction, particularly for volatile stocks like Tesla (TSLA), presents a significant challenge due to market dynamics, investor sentiment, and numerous macroeconomic factors. This project aims to tackle this challenge by implementing and comparing various machine learning and deep learning models. The goal is to identify robust forecasting techniques that can provide insights into future price movements, aiding in more informed decision-making.
+
 ---
 
 ## Features
@@ -24,8 +27,8 @@ The aim is to predict stock price trends accurately and analyze model performanc
 
 * **Model Implementations**
 
-  * Classical ML models: Linear Regression, Random Forest, Decision Tree, Support Vector Regression (SVR), XGBoost, Voting Ensemble
-  * Deep learning models: LSTM and GRU with hyperparameter tuning (using Keras Tuner)
+  * Classical ML models: Linear Regression, Random Forest, Decision Tree, Support Vector Regression (SVR), XGBoost, Voting Ensemble (saved as `.pkl` files using `joblib`)
+  * Deep learning models: LSTM and GRU with hyperparameter tuning (using Keras Tuner) (saved as `.h5` files)
   * Time series forecasting using Facebook Prophet
 
 * **Model Evaluation**
@@ -67,10 +70,10 @@ The aim is to predict stock price trends accurately and analyze model performanc
 │   ├── Models.py                     # Model definitions, training and prediction
 │   ├── Evaluation.py                 # Model evaluation metrics and error analysis
 │   ├── plot_prediction.py            # Visualization of predictions
-│   └── tests/                      # Unit tests for each module
 ├── hyperparameter_tuning/            # Keras Tuner setups for LSTM and GRU
+├── tests/                            # Unit tests for each module
 ├── model_training.ipynb              # End-to-end training and evaluation notebook
-├── model_inferencing.py              # Utilities to load saved models
+├── model_inferencing.ipynb           # Utilities to load saved models
 ├── requirements.txt                  # Required Python packages
 ├── prediction_results.png            # Sample output visualization
 └── README.md                        # This file
@@ -83,8 +86,8 @@ The aim is to predict stock price trends accurately and analyze model performanc
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/Rakib047/Tesla-Stock-Price-Forcasting-Project.git
-cd Tesla-Stock-Price-Forcasting-Project
+git clone https://github.com/Rakib047/Tesla-Stock-Price-Forecasting-Project.git
+cd Tesla-Stock-Price-Forecasting-Project
 ```
 
 2. Install dependencies:
@@ -108,20 +111,28 @@ Ensure you have Python 3.8+ and packages including TensorFlow, scikit-learn, xgb
 
 ### Model Training
 
-* Run the full training pipeline in `model_training.ipynb`.
-* Train classical models (Linear Regression, Random Forest, SVR, XGBoost, Voting Ensemble).
-* Train deep learning models (LSTM and GRU) with hyperparameter tuning.
-* Evaluate each model using multiple metrics and visualize results.
-* Perform walk-forward validation for time series robustness.
+*   Run the `model_training.ipynb` notebook. This Jupyter Notebook provides a step-by-step guide through the entire pipeline:
+    *   Loading and preprocessing the Tesla stock data.
+    *   Performing Exploratory Data Analysis (EDA).
+    *   Training various models: Linear Regression, Random Forest, Decision Tree, SVR, XGBoost, Voting Ensemble, LSTM, and GRU.
+    *   Conducting hyperparameter tuning for LSTM and GRU models using Keras Tuner.
+    *   Evaluating model performance using metrics like MAE, MSE, RMSE, R², and MAPE.
+    *   Visualizing actual vs. predicted stock prices and comparing model performances.
 
 ### Forecasting with Prophet
 
-* Use Facebook Prophet for long-term forecasting and compare predictions against actual 2024 data.
+*   The `model_training.ipynb` also includes a section for time series forecasting using Facebook Prophet, including comparison against actual 2024 data.
 
 ### Model Inference
 
-* Load saved models from the `Models/` directory using `model_inferencing.py`.
-* Use the trained models to make predictions on new data.
+*   Refer to the `model_inferencing.ipynb` notebook. This notebook demonstrates how to:
+    *   Load pre-trained classical machine learning models (saved as `.pkl` files).
+    *   Load pre-trained deep learning models (saved as `.h5` files).
+    *   Make predictions on new, unseen data using these loaded models.
+    *   Verify the structure and configuration of the loaded models.
+
+### Utility Scripts (`Utils/`)
+The Python scripts within the `Utils/` directory (`Data_Preprocessing.py`, `EDA.py`, `Models.py`, `Evaluation.py`, `plot_prediction.py`) contain the core functions for data handling, analysis, model definitions, training logic, evaluation metrics, and plotting. These scripts are primarily imported as modules into the Jupyter notebooks (`model_training.ipynb`, `model_inferencing.ipynb`) and are not typically run as standalone scripts by the end-user.
 
 ---
 
@@ -143,9 +154,12 @@ Tests cover:
 
 ## Results
 
-* Metrics and visualization charts summarize model performances.
-* Evaluation during volatile periods helps understand model robustness.
-* Interactive plots facilitate detailed comparison of actual vs predicted prices.
+The `model_training.ipynb` notebook showcases the detailed performance of each model, including metrics (MAE, MSE, RMSE, R², MAPE) and various visualization charts that summarize model performances. These visualizations include comparisons of actual vs. predicted stock prices and performance during volatile market periods. The `prediction_results.png` file in the root directory provides an example of the kind of graphical output generated by the notebooks.
+
+Key aspects highlighted in the results include:
+*   Comprehensive metrics for both training and testing datasets.
+*   Evaluation of model robustness, particularly during high-volatility periods.
+*   Interactive plots (where applicable, e.g., using Plotly within the notebooks) that allow for detailed inspection of prediction accuracy over time.
 
 ---
 
@@ -153,4 +167,22 @@ Tests cover:
 
 * Data sourced from public Tesla stock price datasets.
 * Utilizes open-source Python libraries including TensorFlow, scikit-learn, XGBoost, Prophet, and Plotly.
+
+## Contributing
+Contributions are welcome! If you have suggestions for improvements or encounter any issues, please feel free to open an issue or submit a pull request.
+
+When contributing to this repository, please first discuss the change you wish to make via an issue with the owners of this repository before making a change.
+
+Please follow these steps to contribute:
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix (`git checkout -b feature/AmazingFeature` or `git checkout -b bugfix/IssueDescription`).
+3.  Make your changes and commit them (`git commit -m 'Add some AmazingFeature'`).
+4.  Push to the branch (`git push origin feature/AmazingFeature`).
+5.  Open a Pull Request.
+
+## License
+This project is licensed under the MIT License.
+
+A copy of the MIT License is typically included in a `LICENSE` file in the root of the repository. While not currently present in this project, the MIT License allows for broad use and modification, provided that the original copyright and license notice are included in any substantial portions of the software.
+
 
