@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+.pytest_cache/
+.env
+venv/
+env/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Output directories from runs (optional, but can keep image smaller)
+# If pre-trained models are to be part of the image, remove Models/ and Scaler/
+# Models/
+# Scaler/
+# hyperparameter_tuning/
+# hyperparameter_tuning_gru/
+# hyperparameter_tuning_sarima/
+
+# Data files - consider if these should be mounted instead if very large
+# For now, assume they are part of the context, but good candidates for .dockerignore
+# if image size becomes an issue and data is provided via volumes.
+# Data/df_test.csv
+# Data/df_train.csv
+# Data/TSLA.csv # If this is a very large raw file that's processed into smaller ones
+# Data/Tasla_Stock_Updated_V2.csv # Main dataset, likely keep this
+
+# Specific files
+prediction_results.png # Output file

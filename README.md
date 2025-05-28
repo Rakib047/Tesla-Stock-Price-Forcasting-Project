@@ -185,4 +185,43 @@ This project is licensed under the MIT License.
 
 A copy of the MIT License is typically included in a `LICENSE` file in the root of the repository. While not currently present in this project, the MIT License allows for broad use and modification, provided that the original copyright and license notice are included in any substantial portions of the software.
 
+## Running with Docker
+
+This project includes a `Dockerfile` to make it easy to build and run in a containerized environment, ensuring all dependencies and settings are consistent.
+
+### Prerequisites
+
+*   [Docker](https://docs.docker.com/get-docker/) installed on your system.
+
+### Building the Docker Image
+
+1.  Clone this repository to your local machine.
+2.  Navigate to the root directory of the project (where the `Dockerfile` is located).
+3.  Run the following command to build the Docker image. Replace `tesla-stock-forecasting` with your preferred image name if desired:
+
+    ```bash
+    docker build -t tesla-stock-forecasting .
+    ```
+
+### Running the Jupyter Notebook Server
+
+After the image is built successfully, you can run a container to start the Jupyter Notebook server:
+
+```bash
+docker run -p 8888:8888 tesla-stock-forecasting
+```
+
+*   The `-p 8888:8888` flag maps port 8888 on your host machine to port 8888 in the container, where Jupyter Notebook is running.
+*   When the container starts, Jupyter Notebook will output a URL in the terminal, usually something like `http://127.0.0.1:8888/?token=xxxxxxxxxxxxxxxxxxxxxxxxxxxx`.
+*   Copy this URL and paste it into your web browser to access the Jupyter environment. You will see the project files and can run the notebooks (`model_training.ipynb`, `model_inferencing.ipynb`).
+
+### Running Other Scripts or Accessing the Shell
+
+If you want to run a specific script or access the shell within the container, you can override the default command. For example, to get an interactive bash shell:
+
+```bash
+docker run -it tesla-stock-forecasting bash
+```
+
+Once inside the container, you can navigate the file system, run Python scripts (e.g., `python Utils/Data_Preprocessing.py`), or execute other commands.
 
